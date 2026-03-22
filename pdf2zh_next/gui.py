@@ -3146,7 +3146,7 @@ def setup_gui(
                 demo.launch(
                     debug=True,
                     inbrowser=inbrowser,
-                    share=True,
+                    share=share,
                     server_port=server_port,
                     allowed_paths=[
                         logo_path,
@@ -3190,7 +3190,7 @@ def setup_gui(
                 demo.launch(
                     debug=True,
                     inbrowser=inbrowser,
-                    share=True,
+                    share=share,
                     auth=user_list,
                     auth_message=html,
                     server_port=server_port,

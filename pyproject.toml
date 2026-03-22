@@ -33,7 +33,7 @@ dependencies = [
     "gradio-pdf>=0.0.21",
     "peewee>=3.17.8",
     "fontTools",
-    "babeldoc>=0.5.20,<0.6.0",
+    "babeldoc @ git+https://github.com/virsnail/BabelDOC.git@main",
     "rich",
     "pydantic-settings>=2.8.1",
     "pydantic>=2.10.6",
@@ -64,7 +64,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/PDFMathTranslate-next/PDFMathTranslate-next"
+Homepage = "https://github.com/virsnail/PDFMathTranslate-next"
 
 [build-system]
 requires = ["hatchling"]

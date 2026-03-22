@@ -23,7 +23,7 @@ ARG CACHE_BUST=1
 RUN echo "cache bust: $CACHE_BUST"
 
 RUN uv pip install --system --no-cache . && \
-    uv pip install --system --no-cache --compile-bytecode -U babeldoc "pymupdf<1.25.3" && \
+    uv pip install --system --no-cache --compile-bytecode -U "git+https://github.com/virsnail/BabelDOC.git@main" "pymupdf<1.25.3" && \
     babeldoc --version && babeldoc --warmup
 
 RUN pdf2zh --version
