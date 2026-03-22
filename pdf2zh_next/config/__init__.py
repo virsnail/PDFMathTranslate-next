@@ -21,7 +21,6 @@ from pdf2zh_next.config.translate_engine_model import ModelScopeSettings
 from pdf2zh_next.config.translate_engine_model import OllamaSettings
 from pdf2zh_next.config.translate_engine_model import OpenAISettings
 from pdf2zh_next.config.translate_engine_model import QwenMtSettings
-from pdf2zh_next.config.translate_engine_model import SiliconFlowSettings
 from pdf2zh_next.config.translate_engine_model import TencentSettings
 from pdf2zh_next.config.translate_engine_model import XinferenceSettings
 from pdf2zh_next.config.translate_engine_model import ZhipuSettings
@@ -42,7 +41,6 @@ __all__ = [
     "AzureOpenAISettings",
     "ModelScopeSettings",
     "ZhipuSettings",
-    "SiliconFlowSettings",
     "TencentSettings",
     "GeminiSettings",
     "AzureSettings",

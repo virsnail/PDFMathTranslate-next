@@ -364,45 +364,7 @@ class ZhipuSettings(BaseModel):
 GUI_PASSWORD_FIELDS.append("zhipu_api_key")
 
 
-class SiliconFlowSettings(BaseModel):
-    """SiliconFlow API settings"""
 
-    translate_engine_type: Literal["SiliconFlow"] = Field(default="SiliconFlow")
-    support_llm: Literal["yes", "no"] = Field(
-        default="yes", description="Whether the translator supports LLM"
-    )
-
-    siliconflow_base_url: str | None = Field(
-        default="https://api.siliconflow.cn/v1",
-        description="Base URL for SiliconFlow API",
-    )
-    siliconflow_model: str = Field(
-        default="Qwen/Qwen2.5-7B-Instruct", description="SiliconFlow model to use"
-    )
-    siliconflow_api_key: str | None = Field(
-        default=None, description="API key for SiliconFlow service"
-    )
-    siliconflow_enable_thinking: bool | None = Field(
-        default=False, description="Enable thinking for SiliconFlow service"
-    )
-    siliconflow_send_enable_thinking_param: bool | None = Field(
-        default=False,
-        description="Send enable thinking param to SiliconFlow service",
-    )
-    siliconflow_enable_json_mode: bool | None = Field(
-        default=False, description="Enable JSON mode for SiliconFlow service"
-    )
-
-    def validate_settings(self) -> None:
-        if not self.siliconflow_api_key:
-            raise ValueError("SiliconFlow API key is required")
-        self.siliconflow_api_key = _clean_string(self.siliconflow_api_key)
-        self.siliconflow_base_url = _clean_string(self.siliconflow_base_url)
-        self.siliconflow_model = _clean_string(self.siliconflow_model)
-
-
-GUI_PASSWORD_FIELDS.append("siliconflow_api_key")
-GUI_SENSITIVE_FIELDS.append("siliconflow_base_url")
 
 
 
@@ -881,9 +843,9 @@ class CLISettings(BaseModel):
 
 # 所有翻译引擎
 TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = (
-    OpenAISettings
+    GoogleSettings
+    | OpenAISettings
     | AliyunDashScopeSettings
-    | GoogleSettings
     | BingSettings
     | DeepLSettings
     | DeepSeekSettings
@@ -892,7 +854,6 @@ TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = (
     | AzureOpenAISettings
     | ModelScopeSettings
     | ZhipuSettings
-    | SiliconFlowSettings
     | TencentSettings
     | GeminiSettings
     | AzureSettings

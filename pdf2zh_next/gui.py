@@ -1642,7 +1642,7 @@ custom_css = """
 # Build paths to resources
 current_dir = Path(__file__).parent
 assets_dir = current_dir / "assets"
-logo_path = assets_dir / "powered_by_siliconflow_light.png"
+# logo_path removed
 translation_file_path = current_dir / "gui_translation.yaml"
 config_fake_pdf_path = DEFAULT_CONFIG_DIR / "config.fake.pdf"
 

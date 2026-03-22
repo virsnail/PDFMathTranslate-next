@@ -13,7 +13,6 @@ from pdf2zh_next.config import ModelScopeSettings
 from pdf2zh_next.config import OllamaSettings
 from pdf2zh_next.config import OpenAISettings
 from pdf2zh_next.config import QwenMtSettings
-from pdf2zh_next.config import SiliconFlowSettings
 from pdf2zh_next.config import TencentSettings
 from pdf2zh_next.config import XinferenceSettings
 from pdf2zh_next.config import ZhipuSettings
@@ -49,7 +48,6 @@ __all__ = [
     "AzureOpenAISettings",
     "ModelScopeSettings",
     "ZhipuSettings",
-    "SiliconFlowSettings",
     "TencentSettings",
     "GeminiSettings",
     "AzureSettings",

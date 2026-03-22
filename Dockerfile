@@ -19,7 +19,7 @@ RUN uv pip install --system --no-cache -r pyproject.toml && \
 COPY . .
 
 # 注意：删除了原版的 random.org 外部请求行
-ARG CACHE_BUST=1
+ARG CACHE_BUST=2
 RUN echo "cache bust: $CACHE_BUST"
 
 RUN uv pip install --system --no-cache . && \
