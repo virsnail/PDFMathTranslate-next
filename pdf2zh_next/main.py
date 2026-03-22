@@ -5,6 +5,12 @@ output it to plain text, html, xml or tags.
 
 from __future__ import annotations
 
+import os
+os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
+os.environ["HF_HUB_OFFLINE"] = "1"          # 禁止 HuggingFace Hub 联网
+os.environ["TRANSFORMERS_OFFLINE"] = "1"     # 禁止 transformers 联网
+os.environ["DO_NOT_TRACK"] = "1"
+
 import asyncio
 import logging
 import os

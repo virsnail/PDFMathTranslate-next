@@ -1,32 +1,30 @@
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
-
 WORKDIR /app
-
-
 EXPOSE 7860
-
 ENV PYTHONUNBUFFERED=1
-
-# # Download all required fonts
-# ADD "https://github.com/satbyy/go-noto-universal/releases/download/v7.0/GoNotoKurrent-Regular.ttf" /app/
-# ADD "https://github.com/timelic/source-han-serif/releases/download/main/SourceHanSerifCN-Regular.ttf" /app/
-# ADD "https://github.com/timelic/source-han-serif/releases/download/main/SourceHanSerifTW-Regular.ttf" /app/
-# ADD "https://github.com/timelic/source-han-serif/releases/download/main/SourceHanSerifJP-Regular.ttf" /app/
-# ADD "https://github.com/timelic/source-han-serif/releases/download/main/SourceHanSerifKR-Regular.ttf" /app/
+ENV GRADIO_ANALYTICS_ENABLED=False
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+ENV DO_NOT_TRACK=1
 
 RUN apt-get update && \
-     apt-get install --no-install-recommends -y libgl1 libglib2.0-0 libxext6 libsm6 libxrender1 build-essential && \
-     rm -rf /var/lib/apt/lists/*
+    apt-get install --no-install-recommends -y \
+    libgl1 libglib2.0-0 libxext6 libsm6 libxrender1 build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml .
-RUN uv pip install --system --no-cache -r pyproject.toml && babeldoc --version && babeldoc --warmup
+RUN uv pip install --system --no-cache -r pyproject.toml && \
+    babeldoc --version && babeldoc --warmup
 
 COPY . .
 
-# Calls for a random number to break the cahing of babeldoc upgrade
-# (https://stackoverflow.com/questions/35134713/disable-cache-for-specific-run-commands/58801213#58801213)
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+# 注意：删除了原版的 random.org 外部请求行
+ARG CACHE_BUST=1
+RUN echo "cache bust: $CACHE_BUST"
 
-RUN uv pip install --system --no-cache . && uv pip install --system --no-cache --compile-bytecode -U babeldoc "pymupdf<1.25.3" && babeldoc --version && babeldoc --warmup
+RUN uv pip install --system --no-cache . && \
+    uv pip install --system --no-cache --compile-bytecode -U babeldoc "pymupdf<1.25.3" && \
+    babeldoc --version && babeldoc --warmup
+
 RUN pdf2zh --version
 CMD ["pdf2zh", "--gui"]
