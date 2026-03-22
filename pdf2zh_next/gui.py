@@ -646,16 +646,15 @@ def _build_translate_settings(
             translate_settings.translation.primary_font_family = primary_font_family
 
     # Calculate and update rate limit settings
-    if service != "SiliconFlowFree":
-        qps, pool_workers = _calculate_rate_limit_params(
-            rate_limit_mode, ui_inputs, translate_settings.translation.qps or 4
-        )
+    qps, pool_workers = _calculate_rate_limit_params(
+        rate_limit_mode, ui_inputs, translate_settings.translation.qps or 4
+    )
 
-        # Update translation settings
-        translate_settings.translation.qps = int(qps)
-        translate_settings.translation.pool_max_workers = (
-            int(pool_workers) if pool_workers is not None else None
-        )
+    # Update translation settings
+    translate_settings.translation.qps = int(qps)
+    translate_settings.translation.pool_max_workers = (
+        int(pool_workers) if pool_workers is not None else None
+    )
 
     # Calculate and update term extraction rate limit settings
     if term_rate_limit_mode:
@@ -2404,10 +2403,6 @@ with gr.Blocks(
                 return
             detail_group_index = detail_text_input_index_map.get(service_name, [])
             llm_support = LLM_support_index_map.get(service_name, False)
-            siliconflow_free_acknowledgement_visible = service_name == "SiliconFlowFree"
-            siliconflow_update = [
-                gr.update(visible=siliconflow_free_acknowledgement_visible)
-            ]
             return_list = []
             glossary_updates = [
                 gr.update(visible=llm_support)
@@ -2415,14 +2410,12 @@ with gr.Blocks(
             ]
             if len(detail_text_inputs) == 1:
                 return_list = (
-                    siliconflow_update
-                    + glossary_updates
+                    glossary_updates
                     + [gr.update(visible=(0 in detail_group_index))]
                 )
             else:
                 return_list = (
-                    siliconflow_update
-                    + glossary_updates
+                    glossary_updates
                     + [
                         gr.update(visible=(i in detail_group_index))
                         for i in range(len(detail_text_inputs))
@@ -2470,9 +2463,6 @@ with gr.Blocks(
 
         def on_rate_limit_mode_change(mode, service_name):
             """Update rate-limit-specific-settings visibility based on rate_limit_mode value"""
-            if service_name == "SiliconFlowFree":
-                return [gr.update(visible=False)] * 4  # Hide all options
-
             rpm_visible = mode == "RPM"
             threads_visible = mode == "Concurrent Threads"
             custom_visible = mode == "Custom"
@@ -2518,16 +2508,11 @@ with gr.Blocks(
             """Expand original on_select_service with rate-limit-UI updated"""
             original_updates = on_select_service(service_name)
 
-            rate_limit_visible = service_name != "SiliconFlowFree"
-
-            detailed_visible = [gr.update(visible=False)] * 4
-
-            if rate_limit_visible:
-                detailed_visible = on_rate_limit_mode_change(mode, service_name)
+            detailed_visible = on_rate_limit_mode_change(mode, service_name)
 
             # Add updates of rate-limit-UI
             rate_limit_updates = [
-                gr.update(visible=rate_limit_visible),
+                gr.update(visible=True),
             ]
 
             return original_updates + rate_limit_updates + detailed_visible
@@ -2835,8 +2820,7 @@ with gr.Blocks(
                 )
                 updates.append(gr.update(value=watermark_value))
                 # Rate Limit Options
-                rate_limit_visible = selected_service != "SiliconFlowFree"
-                updates.append(gr.update(value="Custom", visible=rate_limit_visible))
+                updates.append(gr.update(value="Custom", visible=True))
                 updates.append(gr.update(visible=False))  # rpm_input
                 updates.append(gr.update(visible=False))  # concurrent_threads_input
                 updates.append(
@@ -3037,8 +3021,7 @@ with gr.Blocks(
                         updates.append(gr.update(value=value, visible=visible))
 
                 # Extra UI components at the end of ui_setting_controls
-                siliconflow_free_ack_visible = selected_service == "SiliconFlowFree"
-                updates.append(gr.update(visible=siliconflow_free_ack_visible))
+                updates.append(gr.update(visible=False))  # siliconflow_free_ack (removed)
                 updates.append(
                     gr.update(visible=llm_support)
                 )  # glossary_table visibility
