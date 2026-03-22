@@ -3102,9 +3102,7 @@ def setup_gui(
                 inbrowser=inbrowser,
                 share=share,
                 server_port=server_port,
-                allowed_paths=[
-                    logo_path,
-                ],
+                allowed_paths=[],
             )
         except Exception:
             print(
@@ -3117,9 +3115,7 @@ def setup_gui(
                     inbrowser=inbrowser,
                     share=share,
                     server_port=server_port,
-                    allowed_paths=[
-                        logo_path,
-                    ],
+                    allowed_paths=[],
                 )
             except Exception:
                 print(
@@ -3130,9 +3126,7 @@ def setup_gui(
                     inbrowser=inbrowser,
                     share=share,
                     server_port=server_port,
-                    allowed_paths=[
-                        logo_path,
-                    ],
+                    allowed_paths=[],
                 )
     else:
         try:
@@ -3144,9 +3138,7 @@ def setup_gui(
                 auth=user_list,
                 auth_message=html,
                 server_port=server_port,
-                allowed_paths=[
-                    logo_path,
-                ],
+                allowed_paths=[],
             )
         except Exception:
             print(
@@ -3161,9 +3153,7 @@ def setup_gui(
                     auth=user_list,
                     auth_message=html,
                     server_port=server_port,
-                    allowed_paths=[
-                        logo_path,
-                    ],
+                    allowed_paths=[],
                 )
             except Exception:
                 print(
@@ -3176,9 +3166,7 @@ def setup_gui(
                     auth=user_list,
                     auth_message=html,
                     server_port=server_port,
-                    allowed_paths=[
-                        logo_path,
-                    ],
+                    allowed_paths=[],
                 )
 
 
