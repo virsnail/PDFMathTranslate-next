@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  pdf2zh:
+    build: .
+    image: pdf2zh-safe:latest
+    container_name: pdf2zh-safe-app
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./output:/app/pdf2zh_files
+    restart: unless-stopped
+    environment:
+      - GRADIO_ANALYTICS_ENABLED=False
+      - HF_HUB_OFFLINE=1
+      - TRANSFORMERS_OFFLINE=1
+      - DO_NOT_TRACK=1
