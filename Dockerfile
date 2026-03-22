@@ -9,7 +9,7 @@ ENV DO_NOT_TRACK=1
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
-    libgl1 libglib2.0-0 libxext6 libsm6 libxrender1 build-essential && \
+    libgl1 libglib2.0-0 libxext6 libsm6 libxrender1 build-essential git && \
     rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml .
