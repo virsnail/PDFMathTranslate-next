@@ -468,7 +468,7 @@ def _validate_rate_limit_inputs(
 
 
 def _calculate_rate_limit_params(
-    rate_limit_mode: str, ui_inputs: dict, default_qps: int = 4
+    rate_limit_mode: str, ui_inputs: dict, default_qps: int = 2
 ) -> tuple[int, int | None]:
     """
     Calculate QPS and pool workers based on rate limit mode
@@ -647,7 +647,7 @@ def _build_translate_settings(
 
     # Calculate and update rate limit settings
     qps, pool_workers = _calculate_rate_limit_params(
-        rate_limit_mode, ui_inputs, translate_settings.translation.qps or 4
+        rate_limit_mode, ui_inputs, translate_settings.translation.qps or 2
     )
 
     # Update translation settings
@@ -1655,7 +1655,7 @@ if not config_fake_pdf_path.exists():
 tech_details_string = f"""
                     <summary>Technical details</summary>
                     - ⭐ Star at GitHub: <a href="https://github.com/virsnail/PDFMathTranslate-next">PDFMathTranslate-next/PDFMathTranslate-next</a><br>
-                    - BabelDOC: <a href="https://github.com/funstory-ai/BabelDOC">funstory-ai/BabelDOC</a><br>
+                    - BabelDOC: <a href="https://github.com/virsnail/BabelDOC">funstory-ai/BabelDOC</a><br>
                     - GUI by: <a href="https://github.com/reycn">Rongxin</a> & <a href="https://github.com/hellofinch">hellofinch</a> & <a href="https://github.com/awwaawwa">awwaawwa</a> & <a href="https://github.com/zfb132">zfb132</a><br>
                     - pdf2zh Version: {__version__} <br>
                     - BabelDOC Version: {babeldoc_version}<br>
@@ -1869,7 +1869,7 @@ with gr.Blocks(
 
                         custom_qps_input = gr.Number(
                             label=_("QPS (Queries Per Second)"),
-                            value=settings.translation.qps or 4,
+                            value=settings.translation.qps or 2,
                             precision=0,
                             minimum=1,
                             maximum=1000,
@@ -2825,7 +2825,7 @@ with gr.Blocks(
                 updates.append(gr.update(visible=False))  # concurrent_threads_input
                 updates.append(
                     gr.update(
-                        value=fresh_settings.translation.qps or 4,
+                        value=fresh_settings.translation.qps or 2,
                         visible=True,
                     )
                 )
