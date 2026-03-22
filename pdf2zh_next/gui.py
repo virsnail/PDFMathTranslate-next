@@ -1654,18 +1654,26 @@ if not config_fake_pdf_path.exists():
 
 tech_details_string = f"""
                     <summary>Technical details</summary>
-                    - ⭐ Star at GitHub: <a href="https://github.com/PDFMathTranslate-next/PDFMathTranslate-next">PDFMathTranslate-next/PDFMathTranslate-next</a><br>
+                    - ⭐ Star at GitHub: <a href="https://github.com/virsnail/PDFMathTranslate-next">PDFMathTranslate-next/PDFMathTranslate-next</a><br>
                     - BabelDOC: <a href="https://github.com/funstory-ai/BabelDOC">funstory-ai/BabelDOC</a><br>
                     - GUI by: <a href="https://github.com/reycn">Rongxin</a> & <a href="https://github.com/hellofinch">hellofinch</a> & <a href="https://github.com/awwaawwa">awwaawwa</a> & <a href="https://github.com/zfb132">zfb132</a><br>
                     - pdf2zh Version: {__version__} <br>
                     - BabelDOC Version: {babeldoc_version}<br>
-                    - Free translation service provided by <a href="https://siliconflow.cn/" target="_blank" style="text-decoration: none;">SiliconFlow</a><br>
-                    <a href="https://siliconflow.cn/" target="_blank" style="text-decoration: none;">
-                        <img src="/gradio_api/file={logo_path}" alt="Powered By SiliconFlow" style="height: 40px; margin-top: 10px;">
-                    </a>
                     <br>
                 """
 update_current_languages(settings.gui_settings.ui_lang)
+# Force light mode snippet
+force_light_mode_js = """
+function() {
+    document.body.classList.remove('dark');
+    new MutationObserver(function() {
+        if(document.body.classList.contains('dark')) {
+            document.body.classList.remove('dark');
+        }
+    }).observe(document.body, {attributes: true, attributeFilter: ['class']});
+}
+"""
+
 # The following code creates the GUI
 with gr.Blocks(
     title="PDFMathTranslate - PDF Translation with preserved formats",
@@ -1673,6 +1681,7 @@ with gr.Blocks(
         primary_hue=custom_blue, spacing_size="md", radius_size="lg"
     ),
     css=custom_css,
+    js=force_light_mode_js,
 ) as demo:
     lang_selector = gr.Dropdown(
         choices=LANGUAGES,
@@ -1730,13 +1739,6 @@ with gr.Blocks(
                         choices=list(lang_map.keys()),
                         value=default_lang_to,
                     )
-
-                siliconflow_free_acknowledgement = gr.Markdown(
-                    _(
-                        "Free translation service provided by [SiliconFlow](https://siliconflow.cn)"
-                    ),
-                    visible=True,
-                )
 
                 detail_index = 0
                 term_detail_index = 0
@@ -2560,8 +2562,7 @@ with gr.Blocks(
         )
 
         on_select_service_outputs = (
-            [siliconflow_free_acknowledgement]
-            + require_llm_translator_inputs
+            require_llm_translator_inputs
             + detail_text_inputs
         )
 
@@ -2701,7 +2702,6 @@ with gr.Blocks(
             *translation_engine_arg_inputs,
             # any UI components that are used by translate/save should be listed above!
             # Extra UI components to be updated on load (not used by translate/save)
-            siliconflow_free_acknowledgement,
             glossary_table,
             term_disabled_info,
         ]
@@ -3021,7 +3021,6 @@ with gr.Blocks(
                         updates.append(gr.update(value=value, visible=visible))
 
                 # Extra UI components at the end of ui_setting_controls
-                updates.append(gr.update(visible=False))  # siliconflow_free_ack (removed)
                 updates.append(
                     gr.update(visible=llm_support)
                 )  # glossary_table visibility
