@@ -2819,20 +2819,20 @@ with gr.Blocks(
                     else "No Watermark"
                 )
                 updates.append(gr.update(value=watermark_value))
-                # Rate Limit Options
+                # Rate Limit Options: default to Custom (QPS) mode
                 updates.append(gr.update(value="Custom", visible=True))
                 updates.append(gr.update(visible=False))  # rpm_input
                 updates.append(gr.update(visible=False))  # concurrent_threads_input
                 updates.append(
                     gr.update(
                         value=fresh_settings.translation.qps or 4,
-                        visible=rate_limit_visible,
+                        visible=True,
                     )
                 )
                 updates.append(
                     gr.update(
                         value=fresh_settings.translation.pool_max_workers,
-                        visible=rate_limit_visible,
+                        visible=True,
                     )
                 )
                 # Advanced Options
