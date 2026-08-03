@@ -425,7 +425,7 @@ class SiliconFlowSettings(BaseModel):
     )
 
     siliconflow_base_url: str | None = Field(
-        default="https://api.siliconflow.cn/v1",
+        default="http://127.0.0.1:9999/v1",
         description="Base URL for SiliconFlow API",
     )
     siliconflow_model: str = Field(

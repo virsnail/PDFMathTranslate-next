@@ -2378,10 +2378,6 @@ tech_details_string = f"""
                     - GUI by: <a href="https://github.com/reycn">Rongxin</a> & <a href="https://github.com/hellofinch">hellofinch</a> & <a href="https://github.com/awwaawwa">awwaawwa</a> & <a href="https://github.com/zfb132">zfb132</a><br>
                     - pdf2zh Version: {__version__} <br>
                     - BabelDOC Version: {babeldoc_version}<br>
-                    - Free translation service provided by <a href="https://siliconflow.cn/" target="_blank" style="text-decoration: none;">SiliconFlow</a><br>
-                    <a href="https://siliconflow.cn/" target="_blank" style="text-decoration: none;">
-                        <img src="/gradio_api/file={logo_path}" alt="Powered By SiliconFlow" style="height: 40px; margin-top: 10px; background-color: #ffffff; padding: 4px; border-radius: 4px;">
-                    </a>
                     <br>
                 """
 update_current_languages(settings.gui_settings.ui_lang)
@@ -2400,7 +2396,7 @@ with gr.Blocks(
         render=False,
     )
     with Translate(get_translation_dic(translation_file_path), lang_selector):
-        gr.Markdown("# [PDFMathTranslate Next](https://pdf2zh-next.com)")
+        gr.Markdown("# PDFMathTranslate Next")
 
         translation_engine_arg_inputs = []
         detail_text_inputs = []
@@ -2537,10 +2533,8 @@ with gr.Blocks(
                     # 界面语言切换只在“设置”页展示
                     lang_selector.render()
                     siliconflow_free_acknowledgement = gr.Markdown(
-                        _(
-                            "Free translation service provided by [SiliconFlow](https://siliconflow.cn)"
-                        ),
-                        visible=True,
+                        "",
+                        visible=False,
                     )
 
                     detail_index = 0

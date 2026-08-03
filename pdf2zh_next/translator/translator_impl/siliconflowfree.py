@@ -26,8 +26,8 @@ class ServerNotAvailableError(Exception):
 
 
 AVAILABLE_SERVER_ENDPOINTS = [
-    "https://api1.pdf2zh-next.com/chatproxy",
-    "https://api2.pdf2zh-next.com/chatproxy",
+    "http://127.0.0.1:9999/chatproxy",
+    "http://127.0.0.1:9998/chatproxy",
 ]
 
 
@@ -47,14 +47,11 @@ class SiliconFlowFreeTranslator(BaseTranslator):
         if settings.translate_engine_settings.siliconflow_free_enable_json_mode:
             self.add_cache_impact_parameters("request_json_mode", True)
             self.enable_json_mode = True
-        # CloudFlare has a timeout of 100 seconds
-        self.client = httpx.Client(timeout=100)
+        self.client = httpx.Client(timeout=5)
 
         self.url = AVAILABLE_SERVER_ENDPOINTS[0]
-        self.get_fast_service()
         self.pdf2zh_next_recommended_qps = 10
         self.pdf2zh_next_recommended_pool_max_workers = 100
-        self.fetch_setting()
 
     def fetch_setting(self):
         try:
@@ -179,44 +176,7 @@ class SiliconFlowFreeTranslator(BaseTranslator):
             rate_limit_params,
         )
 
-    @retry(
-        retry=retry_if_exception_type(httpx.HTTPError),
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=30, max=60),
-        before_sleep=before_sleep_log(logger, logging.WARNING),
-    )
-    @retry(
-        retry=retry_if_exception_type(RateLimitError),
-        stop=stop_after_attempt(100),
-        wait=wait_exponential(multiplier=1, min=4, max=120),
-        before_sleep=before_sleep_log(logger, logging.WARNING),
-    )
     def do_llm_translate(self, text, rate_limit_params: dict = None):
-        if text is None:
-            return None
-
-        if (
-            self.enable_json_mode
-            and rate_limit_params
-            and rate_limit_params.get("request_json_mode", False)
-        ):
-            request = {
-                "text": text,
-                "requestJsonMode": True,
-            }
-        else:
-            request = {
-                "text": text,
-            }
-
-        response = self.client.post(
-            self.url,
-            json=request,
-            timeout=60,
+        raise ServerNotAvailableError(
+            "SiliconFlowFree service is disabled locally for privacy and security. Please choose Google, Bing, Ollama, or another provider."
         )
-        if response.status_code == 429:
-            raise RateLimitError
-        response.raise_for_status()
-        message = response.json()["content"]
-        message = self._remove_cot_content(message)
-        return message
