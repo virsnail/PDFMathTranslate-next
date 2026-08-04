@@ -32,7 +32,7 @@ class BingTranslator(BaseTranslator):
         }
 
     def find_sid(self):
-        response = self.session.get(self.endpoint)
+        response = self.session.get(self.endpoint, timeout=15)
         response.raise_for_status()
         url = response.url[:-10]
         ig = re.findall(r"\"ig\":\"(.*?)\"", response.text)[0]
@@ -43,24 +43,31 @@ class BingTranslator(BaseTranslator):
         return url, ig, iid, key, token
 
     @retry(
-        retry=retry_if_exception(Exception),
-        stop=stop_after_attempt(5),
-        wait=wait_exponential(multiplier=1, min=1, max=15),
+        retry=retry_if_exception(lambda e: isinstance(e, requests.RequestException)),
+        stop=stop_after_attempt(2),
+        wait=wait_exponential(multiplier=1, min=1, max=5),
         before_sleep=before_sleep_log(logger, logging.WARNING),
     )
     def do_translate(self, text, rate_limit_params: dict = None):
         text = text[:1000]  # bing translate max length
-        url, ig, iid, key, token = self.find_sid()
-        response = self.session.post(
-            f"{url}ttranslatev3?IG={ig}&IID={iid}",
-            data={
-                "fromLang": self.lang_in,
-                "to": self.lang_out,
-                "text": text,
-                "token": token,
-                "key": key,
-            },
-            headers=self.headers,
-        )
-        response.raise_for_status()
-        return response.json()[0]["translations"][0]["text"]
+        try:
+            url, ig, iid, key, token = self.find_sid()
+            response = self.session.post(
+                f"{url}ttranslatev3?IG={ig}&IID={iid}",
+                data={
+                    "fromLang": self.lang_in,
+                    "to": self.lang_out,
+                    "text": text,
+                    "token": token,
+                    "key": key,
+                },
+                headers=self.headers,
+                timeout=15,
+            )
+            response.raise_for_status()
+            return response.json()[0]["translations"][0]["text"]
+        except requests.RequestException:
+            raise
+        except Exception as e:
+            logger.warning(f"Bing translate parse failed: {e}. Fallback to original text.")
+            return text

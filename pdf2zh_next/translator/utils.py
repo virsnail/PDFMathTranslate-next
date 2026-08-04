@@ -69,8 +69,10 @@ def _create_translator_instance(
                     translator.pdf2zh_next_recommended_pool_max_workers
                 )
 
-            # Health check: perform a short translation ignoring cache to validate translator availability
-            translator.translate("Hello", ignore_cache=True)
+            # Health check skipped - base_translator.translate() already has
+            # fallback-to-original-text logic for failed translations.
+            # The old health check could block for 30+ seconds on network timeout,
+            # causing the entire subprocess to stall.
             return translator, recommended_qps, recommended_pool_max_workers
 
     raise ValueError("No translator found")

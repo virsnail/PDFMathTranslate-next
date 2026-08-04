@@ -33,13 +33,13 @@ class GoogleTranslator(BaseTranslator):
         self.session = requests.Session()
         self.endpoint = "https://translate.google.com/m"
         self.headers = {
-            "User-Agent": "Mozilla/4.0 (compatible;MSIE 6.0;Windows NT 5.1;SV1;.NET CLR 1.1.4322;.NET CLR 2.0.50727;.NET CLR 3.0.04506.30)"  # noqa: E501
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
         }
 
     @retry(
-        retry=retry_if_exception_type(Exception),
-        stop=stop_after_attempt(5),
-        wait=wait_exponential(multiplier=1, min=1, max=15),
+        retry=retry_if_exception_type(requests.RequestException),
+        stop=stop_after_attempt(2),
+        wait=wait_exponential(multiplier=1, min=1, max=5),
         before_sleep=before_sleep_log(logger, logging.WARNING),
     )
     def do_translate(self, text, rate_limit_params: dict = None):
@@ -48,13 +48,20 @@ class GoogleTranslator(BaseTranslator):
             self.endpoint,
             params={"tl": self.lang_out, "sl": self.lang_in, "q": text},
             headers=self.headers,
+            timeout=15,
         )
+        if response.status_code == 400:
+            return text
+        response.raise_for_status()
+
         re_result = re.findall(
             r'(?s)class="(?:t0|result-container)">(.*?)<', response.text
         )
-        if response.status_code == 400:
-            result = "IRREPARABLE TRANSLATION ERROR"
-        else:
-            response.raise_for_status()
-            result = html.unescape(re_result[0])
+        if not re_result:
+            logger.warning(
+                "Google translate HTML parse failed or structure changed. Fallback to original text."
+            )
+            return text
+
+        result = html.unescape(re_result[0])
         return remove_control_characters(result)

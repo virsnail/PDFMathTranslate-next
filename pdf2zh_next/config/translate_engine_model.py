@@ -948,10 +948,8 @@ class CLISettings(BaseModel):
 
 # 所有翻译引擎
 TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = (
-    SiliconFlowFreeSettings
+    GoogleSettings
     | OpenAISettings
-    | AliyunDashScopeSettings
-    | GoogleSettings
     | BingSettings
     | DeepLSettings
     | DeepSeekSettings
@@ -960,8 +958,6 @@ TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = (
     | AzureOpenAISettings
     | ModelScopeSettings
     | ZhipuSettings
-    | SiliconFlowSettings
-    | TencentSettings
     | GeminiSettings
     | AzureSettings
     | AnythingLLMSettings
@@ -978,8 +974,8 @@ TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = (
 NOT_SUPPORTED_TRANSLATION_ENGINE_SETTING_TYPE: TypeAlias = NoneType
 
 # 默认翻译引擎
-_DEFAULT_TRANSLATION_ENGINE = SiliconFlowFreeSettings
-assert len(_DEFAULT_TRANSLATION_ENGINE.model_fields) == 3, (
+_DEFAULT_TRANSLATION_ENGINE = GoogleSettings
+assert len(_DEFAULT_TRANSLATION_ENGINE.model_fields) == 1, (
     "Default translation engine cannot have detail settings"
 )
 

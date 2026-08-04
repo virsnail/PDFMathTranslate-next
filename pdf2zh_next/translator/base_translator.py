@@ -85,7 +85,13 @@ class BaseTranslator(ABC):
             except Exception as e:
                 logger.debug(f"try get cache failed, ignore it: {e}")
         self.rate_limiter.wait(rate_limit_params)
-        translation = self.do_translate(text, rate_limit_params)
+        try:
+            translation = self.do_translate(text, rate_limit_params)
+        except Exception as e:
+            logger.warning(
+                f"Translation failed for text chunk: {e}. Fallback to original text."
+            )
+            return text
         if not (self.ignore_cache or ignore_cache):
             self.cache.set(text, translation)
         return translation
@@ -106,7 +112,13 @@ class BaseTranslator(ABC):
             except Exception as e:
                 logger.debug(f"try get cache failed, ignore it: {e}")
         self.rate_limiter.wait(rate_limit_params)
-        translation = self.do_llm_translate(text, rate_limit_params)
+        try:
+            translation = self.do_llm_translate(text, rate_limit_params)
+        except Exception as e:
+            logger.warning(
+                f"LLM translation failed for text chunk: {e}. Fallback to original text."
+            )
+            return text
         if not (self.ignore_cache or ignore_cache):
             self.cache.set(text, translation)
         return translation

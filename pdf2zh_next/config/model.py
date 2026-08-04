@@ -94,7 +94,7 @@ class TranslationSettings(BaseModel):
     output: str | None = Field(
         default=None, description="Output directory for translated files"
     )
-    qps: int = Field(default=4, description="QPS limit for translation service")
+    qps: int = Field(default=2, description="QPS limit for translation service")
     ignore_cache: bool = Field(default=False, description="Ignore translation cache")
     custom_system_prompt: str | None = Field(
         default=None,

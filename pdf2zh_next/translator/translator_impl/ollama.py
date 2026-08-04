@@ -1,5 +1,6 @@
 import logging
 
+import httpx
 import ollama
 from babeldoc.utils.atomic_integer import AtomicInteger
 from pdf2zh_next.config.model import SettingsModel
@@ -24,12 +25,14 @@ class OllamaTranslator(BaseTranslator):
         rate_limiter: BaseRateLimiter,
     ):
         super().__init__(settings, rate_limiter)
+        num_predict = settings.translate_engine_settings.num_predict or 2000
         self.options = {
             "temperature": 0,
-            "num_predict": settings.translate_engine_settings.num_predict,
+            "num_predict": num_predict,
         }  # 随机采样可能会打断公式标记
         self.client = ollama.Client(
             host=settings.translate_engine_settings.ollama_host,
+            timeout=57,
         )
         self.add_cache_impact_parameters("temperature", self.options["temperature"])
         self.add_cache_impact_parameters("num_predict", self.options["num_predict"])
@@ -41,28 +44,31 @@ class OllamaTranslator(BaseTranslator):
         self.completion_token_count = AtomicInteger()
 
     @retry(
-        retry=retry_if_exception_type(ollama.ResponseError),
+        retry=retry_if_exception_type((ollama.ResponseError, httpx.HTTPError)),
         stop=stop_after_attempt(100),
         wait=wait_exponential(multiplier=1, min=1, max=15),
         before_sleep=before_sleep_log(logger, logging.WARNING),
     )
     def do_translate(self, text, rate_limit_params: dict = None) -> str:
-        if (max_token := len(text) * 5) > self.options["num_predict"]:
+        current_num_predict = self.options.get("num_predict") or 2000
+        if (max_token := len(text) * 5) > current_num_predict:
             self.options["num_predict"] = max_token
         response = self.client.chat(
             model=self.model,
             options=self.options,
             messages=self.prompt(text),
         )
-        self.token_count.inc(response.prompt_eval_count + response.eval_count)
-        self.prompt_token_count.inc(response.prompt_eval_count)
-        self.completion_token_count.inc(response.eval_count)
+        prompt_eval_count = getattr(response, "prompt_eval_count", 0) or 0
+        eval_count = getattr(response, "eval_count", 0) or 0
+        self.token_count.inc(prompt_eval_count + eval_count)
+        self.prompt_token_count.inc(prompt_eval_count)
+        self.completion_token_count.inc(eval_count)
         message = response.message.content.strip()
         message = self._remove_cot_content(message)
         return message
 
     @retry(
-        retry=retry_if_exception_type(ollama.ResponseError),
+        retry=retry_if_exception_type((ollama.ResponseError, httpx.HTTPError)),
         stop=stop_after_attempt(100),
         wait=wait_exponential(multiplier=1, min=1, max=15),
         before_sleep=before_sleep_log(logger, logging.WARNING),
@@ -71,7 +77,8 @@ class OllamaTranslator(BaseTranslator):
         if text is None:
             return None
 
-        if (max_token := len(text) * 5) > self.options["num_predict"]:
+        current_num_predict = self.options.get("num_predict") or 2000
+        if (max_token := len(text) * 5) > current_num_predict:
             self.options["num_predict"] = max_token
 
         response = self.client.chat(
@@ -84,9 +91,11 @@ class OllamaTranslator(BaseTranslator):
                 },
             ],
         )
-        self.token_count.inc(response.prompt_eval_count + response.eval_count)
-        self.prompt_token_count.inc(response.prompt_eval_count)
-        self.completion_token_count.inc(response.eval_count)
+        prompt_eval_count = getattr(response, "prompt_eval_count", 0) or 0
+        eval_count = getattr(response, "eval_count", 0) or 0
+        self.token_count.inc(prompt_eval_count + eval_count)
+        self.prompt_token_count.inc(prompt_eval_count)
+        self.completion_token_count.inc(eval_count)
         message = response.message.content.strip()
         message = self._remove_cot_content(message)
         return message
